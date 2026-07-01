@@ -1,0 +1,11 @@
+# Privacy: never version-control original documents or generated reports.
+raw/
+outputs/
+
+# Keep the empty-directory placeholders out of git noise (dirs still tracked via .gitkeep
+# in wiki/ subfolders; raw/ and outputs/ are ignored wholesale above).
+.DS_Store
+
+# NOTE: git is optional here. If you `git init`, this keeps your sensitive originals (raw/)
+# and generated reports (outputs/) untracked so they can never be committed or pushed.
+# The wiki/ summaries ARE tracked so you get version history of the knowledge base.
