@@ -136,7 +136,7 @@ anything already overdue.
 **status-list** (example name `open-questions`):
 ```
 ---
-description: Show open <name> from the wiki, grouped by status
+description: Show <name> from the wiki, grouped by status
 argument-hint: "[optional status filter, e.g. 'open' or 'blocked']"
 disable-model-invocation: true
 ---
@@ -221,8 +221,9 @@ which a new wiki should not carry.
 - If there is no `.git/`: offer to `git init` a fresh repo.
 
 Either way, leave making the first commit to the human — or, if they ask, stage `wiki/`,
-`wiki-config.md`, `.claude/`, and the docs and make an initial commit. Never commit `raw/` or
-`outputs/` (they are git-ignored).
+`wiki-config.md`, `.claude/`, and the docs and make an initial commit. Never commit `outputs/`
+(always git-ignored); commit `raw/` only if the human chose `commit_raw: true` in question 5 —
+otherwise it stays git-ignored too.
 
 ## Step 7 — Report
 

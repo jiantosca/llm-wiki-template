@@ -32,6 +32,7 @@ generates a standing-topic command tailored to your choice, and seeds the wiki. 
 clean history — it asks first, since that's destructive. Done.
 
 From then on:
+
 - Drop files anywhere under `raw/`, then `/wiki-ingest` — process everything new or changed.
 - **Just type your question** — it's answered from your wiki, with citations. No command needed.
 - `/wiki-<your-standing-topic>` — the command init generated for you (e.g. `/wiki-renewals`).
@@ -41,11 +42,11 @@ From then on:
 
 ## The three layers (why this template is structured the way it is)
 
-| Layer | Files | Who owns it |
-|-------|-------|-------------|
-| **Engine** (generic, reusable) | `CLAUDE.md`, `.claude/commands/wiki-{init,ingest,query,lint}.md` | the template — never contains domain facts |
-| **Config** (your domain, written once) | `wiki-config.md` | `/wiki-init` writes it |
-| **Derived** (generated for your domain) | `.claude/commands/wiki-<standing-topic>.md`, `raw/<category>/` folders, seeded `wiki/index.md` | `/wiki-init` generates it |
+| Layer                                   | Files                                                                                          | Who owns it                                |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| **Engine** (generic, reusable)          | `CLAUDE.md`, `.claude/commands/wiki-{init,ingest,query,lint}.md`                               | the template — never contains domain facts |
+| **Config** (your domain, written once)  | `wiki-config.md`                                                                               | `/wiki-init` writes it                     |
+| **Derived** (generated for your domain) | `.claude/commands/wiki-<standing-topic>.md`, `raw/<category>/` folders, seeded `wiki/index.md` | `/wiki-init` generates it                  |
 
 Keeping domain out of `CLAUDE.md` and in `wiki-config.md` is deliberate: the engine stays
 identical across every wiki, so it can be improved (or one day shipped as a Claude Code plugin)
