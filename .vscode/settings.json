@@ -1,0 +1,7 @@
+{
+  // This repo's Markdown (CLAUDE.md, wiki-config.md, the /wiki-* commands, and the
+  // agent-generated wiki/ pages) is authored by the LLM and reviewed as diffs. Auto-formatting
+  // on save rewrites those files between edit and review, creating churn the agent never saw.
+  // Keep it off so every change is a deliberate, reviewable edit.
+  "editor.formatOnSave": false
+}
