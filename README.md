@@ -23,19 +23,24 @@ Then, in Claude:
 /wiki-init
 ```
 
-It asks five things — **subject**, **`raw/` categories**, a **standing topic** (the one recurring
-thing worth its own page + command, e.g. renewals / open-questions / decisions / none),
-**sensitivity** (what to redact), and whether to **commit `raw/`** to git or keep it ignored —
-then writes `wiki-config.md`, creates your `raw/` folders,
-generates a standing-topic command tailored to your choice, and seeds the wiki. It also offers to
-**reset git history** (a `cp -R` copy inherits the template's `.git/`) so your wiki starts its own
-clean history — it asks first, since that's destructive. Done.
+It asks five things:
+
+1. **Subject** — what this wiki is about.
+2. **`raw/` categories** — the subfolders your source documents get bucketed into.
+3. **Standing topics** — the recurring things worth their own page + command, as many as you like (e.g. renewals / open-questions / decisions / none).
+4. **Sensitivity** — what to redact from wiki pages (account numbers, names, credentials, or none).
+5. **Commit `raw/`?** — version the original documents in git, or keep them ignored.
+
+Then it writes `wiki-config.md`, creates your `raw/` folders, generates a standing-topic command
+for each topic you chose, and seeds the wiki. It also offers to **reset git history** (a `cp -R`
+copy inherits the template's `.git/`) so your wiki starts its own clean history — it asks first,
+since that's destructive. Done.
 
 From then on:
 
 - Drop files anywhere under `raw/`, then `/wiki-ingest` — process everything new or changed.
 - **Just type your question** — it's answered from your wiki, with citations. No command needed.
-- `/wiki-<your-standing-topic>` — the command init generated for you (e.g. `/wiki-renewals`).
+- `/wiki-<your-standing-topic>` — one command per standing topic init generated for you (e.g. `/wiki-renewals`).
 - `/wiki-lint` — periodic health check (contradictions, stale facts, broken links).
 
 ---
@@ -46,7 +51,7 @@ From then on:
 | --------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------ |
 | **Engine** (generic, reusable)          | `CLAUDE.md`, `.claude/commands/wiki-{init,ingest,query,lint}.md`                               | the template — never contains domain facts |
 | **Config** (your domain, written once)  | `wiki-config.md`                                                                               | `/wiki-init` writes it                     |
-| **Derived** (generated for your domain) | `.claude/commands/wiki-<standing-topic>.md`, `raw/<category>/` folders, seeded `wiki/index.md` | `/wiki-init` generates it                  |
+| **Derived** (generated for your domain) | `.claude/commands/wiki-<standing-topic>.md` (one per topic), `raw/<category>/` folders, seeded `wiki/index.md` | `/wiki-init` generates it                  |
 
 Keeping domain out of `CLAUDE.md` and in `wiki-config.md` is deliberate: the engine stays
 identical across every wiki, so it can be improved (or one day shipped as a Claude Code plugin)
@@ -69,7 +74,7 @@ llm-wiki-template/
 ├── wiki/                    ← Claude-GENERATED summaries (what you query)
 │   ├── index.md   log.md   overview.md
 │   ├── entities/            ← one page per concrete thing
-│   ├── topics/              ← cross-cutting pages, incl. your standing topic
+│   ├── topics/              ← cross-cutting pages, incl. your standing topics
 │   └── sources/             ← one summary per ingested raw document
 │
 ├── outputs/                 ← generated reports & lint results (disposable)

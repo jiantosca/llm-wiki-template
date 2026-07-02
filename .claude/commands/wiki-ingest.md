@@ -8,7 +8,7 @@ disable-model-invocation: true
 to run `/wiki-init` first, and do nothing else.
 
 Follow the INGEST workflow in `CLAUDE.md`. Read `wiki-config.md` first for this wiki's categories,
-standing topic, and redaction rules.
+standing topics, and redaction rules.
 
 If an argument is given, ingest that specific file: `$ARGUMENTS`
 
@@ -18,6 +18,6 @@ are new (no source page) or changed (hash differs). Skip unchanged files. Then r
 ingested, changed, or skipped.
 
 For every ingested file: write/update the `wiki/sources/` summary (with `hash` + `source`
-frontmatter), update relevant `wiki/entities/` and `wiki/topics/` pages, extract items into the
+frontmatter), update relevant `wiki/entities/` and `wiki/topics/` pages, extract items into each
 standing-topic page named in `wiki-config.md` (if any), update `wiki/index.md`, and append to
 `wiki/log.md`. Redact whatever `wiki-config.md`'s `sensitivity` field lists.

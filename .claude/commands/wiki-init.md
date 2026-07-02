@@ -1,12 +1,12 @@
 ---
-description: Initialize this wiki for a specific domain — interview, then scaffold config, folders, and a standing-topic command
+description: Initialize this wiki for a specific domain — interview, then scaffold config, folders, and standing-topic commands
 argument-hint: "[optional: one-line description of the wiki's subject]"
 disable-model-invocation: true
 ---
 
 You are setting up a fresh LLM wiki from the template. Your job: interview the human, then write
-`wiki-config.md`, create the `raw/` category folders, generate the standing-topic command, and
-seed the wiki. **Do NOT edit `CLAUDE.md`** — it is the generic engine and stays untouched. All
+`wiki-config.md`, create the `raw/` category folders, generate a standing-topic command per topic,
+and seed the wiki. **Do NOT edit `CLAUDE.md`** — it is the generic engine and stays untouched. All
 domain-specific facts go in `wiki-config.md` and the generated command only.
 
 If `wiki-config.md` already exists, this wiki is already initialized — stop and ask the human
@@ -21,13 +21,14 @@ defaults based on the subject so they can just confirm.
 1. **Subject** — what is this wiki about, in one line?
 2. **`raw/` categories** — what top-level buckets should raw documents be organized into?
    (Suggest 4–6 based on the subject; let them edit.)
-3. **Standing topic** — ask in plain language: *"Is there one recurring thing you'll want to
-   check across all your documents — its own page plus a quick command to pull it up?"* Explain
-   briefly and give 2–3 examples drawn from THEIR subject, then offer the general menu: upcoming
-   deadlines/renewals, a to-do or open-questions list, a running log of decisions, a glossary of
-   terms, a tracked number over time, a timeline of events, or a comparison of options — or
-   "none." Let them answer however they like (their own name + a sentence on what it should do);
-   **you** map that to a type using the catalog below. Don't make them learn the type names.
+3. **Standing topics** — ask in plain language: *"Are there recurring things you'll want to
+   check across all your documents — each gets its own page plus a quick command to pull it up?"*
+   Explain briefly and give 2–3 examples drawn from THEIR subject, then offer the general menu:
+   upcoming deadlines/renewals, a to-do or open-questions list, a running log of decisions, a
+   glossary of terms, a tracked number over time, a timeline of events, or a comparison of
+   options — or "none." They can pick as many as they want (or none). For each, let them answer
+   however they like (their own name + a sentence on what it should do); **you** map each to a
+   type using the catalog below. Don't make them learn the type names.
 4. **Sensitivity** — is any source material sensitive? What must be redacted in wiki summaries
    (e.g. account numbers, SSNs, names, credentials), or "none"?
 5. **Commit `raw/`?** — should the original documents in `raw/` be committed to git, or kept out
@@ -67,9 +68,10 @@ The types:
 - **timeline** — events in the order they happened. Command lists forward-chronologically (oldest
   first) with dates.
 - **comparison** — options judged across criteria. Command presents a table (options × criteria).
-- **none** — skip the standing-topic page and generate no extra command.
+- **none** — the human wants no standing topics; leave `standing_topics` empty (`[]`) and
+  generate no extra commands.
 
-If the human's idea doesn't fit any of these cleanly, infer the closest command shape from their
+If a topic idea doesn't fit any of these cleanly, infer the closest command shape from its
 description and note which pattern you based it on.
 
 ## Step 2 — Write `wiki-config.md`
@@ -80,9 +82,10 @@ Create it at the wiki root:
 ---
 subject: <one line>
 raw_categories: [<cat>, <cat>, ...]
-standing_topic:
-  name: <slug or "none">          # e.g. renewals, open-questions
-  type: <temporal | status-list | decision-log | glossary | metrics | timeline | comparison | none>
+standing_topics:                  # list of topics; use [] for none
+  - name: <slug>                  # e.g. renewals, open-questions
+    type: <temporal | status-list | decision-log | glossary | metrics | timeline | comparison>
+  # …one entry per standing topic
 sensitivity: <what to redact, or "none">
 commit_raw: <true | false>        # whether raw/ is version-controlled (see Step 3)
 updated: <today>
@@ -116,10 +119,11 @@ Then apply the answer to question 5 by editing `.gitignore`:
 
   (Keep `outputs/` ignored either way.)
 
-## Step 4 — Generate the standing-topic command
+## Step 4 — Generate the standing-topic commands
 
-Skip entirely if the standing topic is `none`. Otherwise write
-`.claude/commands/wiki-<standing_topic.name>.md`, choosing the body by type.
+Skip entirely if `standing_topics` is empty. Otherwise, for **each** topic in the list, write
+`.claude/commands/wiki-<name>.md`, choosing the body by that topic's `type`. The templates below
+show one example per type; generate one command file per topic.
 
 **temporal** (example name `renewals`):
 ```
@@ -203,9 +207,9 @@ If an option or criterion is given, focus or sort by it: $ARGUMENTS.
 ## Step 5 — Seed the wiki
 
 - `wiki/index.md`: a heading per `raw_category`, plus a "Topics" section listing the standing
-  topic (if any). No entries yet — just the skeleton.
-- `wiki/topics/<standing_topic>.md`: create the empty standing-topic page with proper frontmatter
-  (`type: topic`) and a one-line description of what it tracks. Skip if `none`.
+  topics (if any). No entries yet — just the skeleton.
+- `wiki/topics/<name>.md`: for each standing topic, create an empty page with proper frontmatter
+  (`type: topic`) and a one-line description of what it tracks. Skip if the list is empty.
 - `wiki/overview.md`: a one-paragraph stub restating the subject.
 - `wiki/log.md`: append `## [<today>] init | initialized wiki for <subject>`.
 
@@ -227,5 +231,5 @@ otherwise it stays git-ignored too.
 
 ## Step 7 — Report
 
-Tell the human what you created (config, categories, standing-topic command name), whether git was
+Tell the human what you created (config, categories, standing-topic command names), whether git was
 reset, and the next step: drop files into `raw/<category>/`, then run `/wiki-ingest`.

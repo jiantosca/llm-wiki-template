@@ -11,7 +11,7 @@ Mental model — a compiler: `raw/` = source code, you = compiler, `wiki/` = com
 ## Read the config first
 
 This wiki's domain lives entirely in **`wiki-config.md`** at the root — subject, `raw/`
-categories, the standing topic, and the redaction (`sensitivity`) rules. **Read it before any
+categories, the standing topics, and the redaction (`sensitivity`) rules. **Read it before any
 operation.** If `wiki-config.md` does not exist yet, this is a fresh, un-initialized wiki: tell
 the human to run `/wiki-init` first. Never bake domain facts into this file — they belong in
 `wiki-config.md` only.
@@ -25,13 +25,13 @@ the human to run `/wiki-init` first. Never bake domain facts into this file — 
 - `outputs/` — generated reports/lint results. Disposable.
 
 ```
-wiki-config.md     ← this wiki's domain (subject, categories, standing topic, sensitivity)
+wiki-config.md     ← this wiki's domain (subject, categories, standing topics, sensitivity)
 raw/<categories>/  ← originals, bucketed by the categories in wiki-config.md
 wiki/index.md      ← catalog of every wiki page (keep current)
 wiki/log.md        ← append-only operation history
 wiki/overview.md   ← high-level snapshot of the whole picture
 wiki/entities/     ← one page per concrete thing (whatever the domain's core nouns are)
-wiki/topics/       ← cross-cutting pages, incl. the standing topic from wiki-config.md
+wiki/topics/       ← cross-cutting pages, incl. the standing topics from wiki-config.md
 wiki/sources/      ← one summary page per ingested raw document
 ```
 
@@ -78,8 +78,8 @@ no tokens and lets bulk ingest detect files that changed in place.
 ## Operation: INIT
 
 Only relevant for a fresh wiki with no `wiki-config.md`. Follow the `/wiki-init` command: interview
-the human, write `wiki-config.md`, create the `raw/` category folders, generate the standing-topic
-command, and seed the wiki. Do not perform init logic anywhere else.
+the human, write `wiki-config.md`, create the `raw/` category folders, generate a standing-topic
+command per topic, and seed the wiki. Do not perform init logic anywhere else.
 
 ## Operation: INGEST
 
@@ -90,8 +90,8 @@ Read `wiki-config.md` first. Two modes — both supported:
 2. Briefly tell the human the key takeaways.
 3. Write/update `wiki/sources/<doc>.md` (summary + frontmatter incl. `hash` + `source`).
 4. Create/update the relevant `wiki/entities/` and/or `wiki/topics/` pages.
-5. If `wiki-config.md` defines a standing topic, extract the items it tracks into
-   `wiki/topics/<standing_topic>.md`, in the form its `type` implies — e.g. **temporal**: dates
+5. For each standing topic listed in `wiki-config.md` (the `standing_topics` list), extract the
+   items it tracks into `wiki/topics/<name>.md`, in the form its `type` implies — e.g. **temporal**: dates
    that matter (deadlines, expirations, maturities); **status-list**: open items/tasks/risks;
    **decision-log**: decisions + rationale; **glossary**: terms + definitions; **metrics**: a
    dated reading of each tracked value; **timeline**: dated events; **comparison**: an option

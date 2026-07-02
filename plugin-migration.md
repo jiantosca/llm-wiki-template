@@ -53,7 +53,7 @@ every wiki. Confirm plugin hook registration semantics before relying on this.
 
 ## What stays the same
 - `wiki-config.md` remains the per-wiki, user-owned domain config (written by init).
-- The derived standing-topic command is still generated per-wiki by init.
+- The derived standing-topic commands are still generated per-wiki by init.
 - The compiler mental model and the ingest/query/lint/harvest operations are unchanged.
 
 ## Open decisions (revisit before implementing)
