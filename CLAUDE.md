@@ -111,6 +111,13 @@ Read `wiki-config.md` first. Two modes — both supported:
 
 Only new/changed files are read into context. Never re-read unchanged files.
 
+**Category reconciliation (both modes).** If an ingested file sits in a `raw/` subfolder not
+listed in `raw_categories` in `wiki-config.md`, the human created a new category by hand — this
+is supported, not an error. Register it: append the folder name to `raw_categories` (bump
+`updated`), add the category heading to `wiki/index.md`, and mention the new category in your
+report. The plain-language route works too: if the human asks you to "add a category", create
+`raw/<name>/` with a `.gitkeep` inside and make the same config + index updates.
+
 ## Operation: QUERY
 
 1. Read `wiki/index.md` first to find relevant pages (do NOT scan all of `raw/`).
@@ -127,6 +134,12 @@ Sweep the wiki for health and write results to `outputs/lint-YYYY-MM-DD.md`:
 - Orphan pages (no incoming `[[wikilinks]]`).
 - Broken `[[wikilinks]]` and concepts referenced but never created.
 - `wiki/sources/` pages whose `raw/` file no longer exists, or whose hash now differs.
+- **Category drift** — report only; lint never edits the wiki or config:
+  - a `raw/` subfolder not listed in `raw_categories` (unregistered category — if it has files,
+    suggest `/wiki-ingest`, which registers it; if empty, note it as informational since it
+    self-registers on first ingest);
+  - a category in `raw_categories` whose `raw/` folder is missing;
+  - a category in `raw_categories` with no heading in `wiki/index.md`.
 
 ## Bookkeeping rules
 

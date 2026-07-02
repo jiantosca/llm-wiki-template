@@ -122,8 +122,12 @@ Then apply the answer to question 5 by editing `.gitignore`:
 ## Step 4 — Generate the standing-topic commands
 
 Skip entirely if `standing_topics` is empty. Otherwise, for **each** topic in the list, write
-`.claude/commands/wiki-<name>.md`, choosing the body by that topic's `type`. The templates below
-show one example per type; generate one command file per topic.
+`.claude/commands/wiki-topic-<name>.md`, choosing the body by that topic's `type`. The templates
+below show one example per type; generate one command file per topic.
+
+The `wiki-topic-` prefix is required: it namespaces the generated commands away from the engine
+commands (`wiki-init/ingest/query/lint`) so a topic named e.g. "query" can never overwrite one,
+and it makes clear in a directory listing which commands are derived and regenerable.
 
 **temporal** (example name `renewals`):
 ```
@@ -225,9 +229,11 @@ which a new wiki should not carry.
 - If there is no `.git/`: offer to `git init` a fresh repo.
 
 Either way, leave making the first commit to the human — or, if they ask, stage `wiki/`,
-`wiki-config.md`, `.claude/`, and the docs and make an initial commit. Never commit `outputs/`
-(always git-ignored); commit `raw/` only if the human chose `commit_raw: true` in question 5 —
-otherwise it stays git-ignored too.
+`wiki-config.md`, `.claude/`, `.vscode/`, `.gitignore`, and the docs and make an initial commit.
+`.vscode/` is part of the template (it disables format-on-save so the editor doesn't rewrite
+LLM-authored markdown) — include it even though editor config is normally personal. Never commit
+`outputs/` (always git-ignored); commit `raw/` only if the human chose `commit_raw: true` in
+question 5 — otherwise it stays git-ignored too.
 
 ## Step 7 — Report
 

@@ -39,9 +39,13 @@ since that's destructive. Done.
 From then on:
 
 - Drop files anywhere under `raw/`, then `/wiki-ingest` — process everything new or changed.
+  New folders you create under `raw/` become new categories automatically (see
+  ["Adding a category later"](#adding-a-category-later)).
 - **Just type your question** — it's answered from your wiki, with citations. No command needed.
-- `/wiki-<your-standing-topic>` — one command per standing topic init generated for you (e.g. `/wiki-renewals`).
-- `/wiki-lint` — periodic health check (contradictions, stale facts, broken links).
+- `/wiki-topic-<your-standing-topic>` — one command per standing topic init generated for you (e.g. `/wiki-topic-renewals`).
+- `/wiki-lint` — periodic health check (contradictions, stale facts, broken links). Its product
+  is a report in `outputs/` — it never edits the wiki, so it's always safe to run; you (or
+  Claude, if you ask) fix things from the report.
 
 ---
 
@@ -49,9 +53,9 @@ From then on:
 
 | Layer                                   | Files                                                                                          | Who owns it                                |
 | --------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| **Engine** (generic, reusable)          | `CLAUDE.md`, `.claude/commands/wiki-{init,ingest,query,lint}.md`                               | the template — never contains domain facts |
+| **Engine** (generic, reusable)          | `CLAUDE.md`, `.claude/commands/wiki-{init,ingest,query,lint}.md`, `.vscode/settings.json`      | the template — never contains domain facts |
 | **Config** (your domain, written once)  | `wiki-config.md`                                                                               | `/wiki-init` writes it                     |
-| **Derived** (generated for your domain) | `.claude/commands/wiki-<standing-topic>.md` (one per topic), `raw/<category>/` folders, seeded `wiki/index.md` | `/wiki-init` generates it                  |
+| **Derived** (generated for your domain) | `.claude/commands/wiki-topic-<standing-topic>.md` (one per topic), `raw/<category>/` folders, seeded `wiki/index.md` | `/wiki-init` generates it                  |
 
 Keeping domain out of `CLAUDE.md` and in `wiki-config.md` is deliberate: the engine stays
 identical across every wiki, so it can be improved (or one day shipped as a Claude Code plugin)
@@ -78,11 +82,37 @@ llm-wiki-template/
 │   └── sources/             ← one summary per ingested raw document
 │
 ├── outputs/                 ← generated reports & lint results (disposable)
-└── .claude/commands/        ← the /wiki-* slash commands
+├── .claude/commands/        ← the /wiki-* slash commands
+└── .vscode/                 ← template editor config (format-on-save off — part of the repo)
 ```
 
 **Mental model — a compiler:** `raw/` = source code, Claude = compiler, `wiki/` = compiled
 output. Operations: **init**, **ingest**, **query**, **lint**.
+
+---
+
+## Adding a category later
+
+Categories aren't fixed at init — the supported way to add one is to just create the folder:
+
+```bash
+mkdir raw/crypto                                    # any new bucket you need
+mv ~/Downloads/coinbase-statement.pdf raw/crypto/
+```
+
+The next `/wiki-ingest` notices the unregistered folder and registers it: `crypto` is added to
+`raw_categories` in `wiki-config.md`, a heading is added to `wiki/index.md`, and the files are
+ingested — no command to run, no config to hand-edit. Asking Claude in plain language ("add a
+crypto category") works too; it creates the folder and makes the same updates.
+
+`/wiki-lint` is the safety net for category drift. Like any linter, **its product is the
+report**: it writes findings to `outputs/lint-YYYY-MM-DD.md` and changes nothing else — you (or
+Claude, on request) act on them afterwards. For categories it flags:
+
+- a `raw/` folder that isn't registered in `wiki-config.md` yet (if it has files, the fix is
+  `/wiki-ingest`; an empty one is fine — it self-registers the first time you ingest into it);
+- a category in `wiki-config.md` whose `raw/` folder has gone missing;
+- a category missing its heading in `wiki/index.md`.
 
 ---
 
