@@ -39,7 +39,8 @@ since that's destructive. Done.
 From then on:
 
 - Drop files anywhere under `raw/`, then `/wiki-ingest` — process everything new or changed.
-  New folders you create under `raw/` become new categories automatically (see
+  New top-level folders you create under `raw/` become new categories automatically, and you can
+  nest folders as deep as you like inside a category (see
   ["Adding a category later"](#adding-a-category-later)).
 - **Just type your question** — it's answered from your wiki, with citations. No command needed.
 - `/wiki-topic-<your-standing-topic>` — one command per standing topic init generated for you (e.g. `/wiki-topic-renewals`).
@@ -105,12 +106,19 @@ The next `/wiki-ingest` notices the unregistered folder and registers it: `crypt
 ingested — no command to run, no config to hand-edit. Asking Claude in plain language ("add a
 crypto category") works too; it creates the folder and makes the same updates.
 
+**Only top-level folders are categories.** Inside a category, nest folders however you like —
+`raw/finance/taxes/2024/`, `raw/finance/insurance/auto/` — it's your filing structure, and the
+full path is preserved in each source page's traceability link. The engine never registers a
+nested folder as a category, so deep trees don't sprawl `wiki-config.md` or the index: a file at
+`raw/finance/taxes/2024/w2.pdf` simply belongs to `finance`.
+
 `/wiki-lint` is the safety net for category drift. Like any linter, **its product is the
 report**: it writes findings to `outputs/lint-YYYY-MM-DD.md` and changes nothing else — you (or
 Claude, on request) act on them afterwards. For categories it flags:
 
-- a `raw/` folder that isn't registered in `wiki-config.md` yet (if it has files, the fix is
-  `/wiki-ingest`; an empty one is fine — it self-registers the first time you ingest into it);
+- a top-level `raw/` folder that isn't registered in `wiki-config.md` yet (if it has files, the
+  fix is `/wiki-ingest`; an empty one is fine — it self-registers the first time you ingest into
+  it; nested folders are never flagged);
 - a category in `wiki-config.md` whose `raw/` folder has gone missing;
 - a category missing its heading in `wiki/index.md`.
 

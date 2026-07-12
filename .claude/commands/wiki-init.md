@@ -20,7 +20,10 @@ defaults based on the subject so they can just confirm.
 
 1. **Subject** — what is this wiki about, in one line?
 2. **`raw/` categories** — what top-level buckets should raw documents be organized into?
-   (Suggest 4–6 based on the subject; let them edit.)
+   (Suggest 4–6 based on the subject; let them edit. Reassure them the list isn't locked in:
+   they can add a category anytime later by just creating a new top-level folder under `raw/` —
+   it registers itself on the next ingest — and they can nest folders freely inside a category
+   without creating new categories.)
 3. **Standing topics** — ask in plain language: *"Are there recurring things you'll want to
    check across all your documents — each gets its own page plus a quick command to pull it up?"*
    Explain briefly and give 2–3 examples drawn from THEIR subject, then offer the general menu:
@@ -238,4 +241,6 @@ question 5 — otherwise it stays git-ignored too.
 ## Step 7 — Report
 
 Tell the human what you created (config, categories, standing-topic command names), whether git was
-reset, and the next step: drop files into `raw/<category>/`, then run `/wiki-ingest`.
+reset, and the next step: drop files into `raw/<category>/`, then run `/wiki-ingest`. Remind them
+that adding a category later is just creating a new top-level folder under `raw/` — it's
+registered automatically on the next ingest — and that nesting folders inside a category is fine.

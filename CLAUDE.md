@@ -38,6 +38,11 @@ wiki/sources/      ← one summary page per ingested raw document
 ## Page conventions
 
 - **Filenames:** kebab-case matching the thing (e.g. `<slug>.md`).
+- **`wiki/sources/` is flat** — never mirror `raw/`'s folder tree; traceability lives in the
+  `source:` frontmatter. Since it's flat, each source page needs a unique, descriptive name:
+  when raw basenames collide (`w2.pdf` across tax years, `statement.pdf` across accounts), fold
+  the distinguishing context into the name — `w2-2024.md`, `chase-statement-2026-03.md` — rather
+  than mechanically concatenating the full path.
 - **Cross-links:** use `[[wikilinks]]` for every internal reference.
 - **Source traceability:** every `wiki/sources/` page links back to its `raw/` path.
 - **Absolute dates only.** Never "last year" — write the full `YYYY-MM-DD`.
@@ -88,7 +93,8 @@ Read `wiki-config.md` first. Two modes — both supported:
 **A. Specific file** ("ingest raw/<category>/<file>"):
 1. Read the source. (Claude Code can read PDFs directly.)
 2. Briefly tell the human the key takeaways.
-3. Write/update `wiki/sources/<doc>.md` (summary + frontmatter incl. `hash` + `source`).
+3. Write/update `wiki/sources/<doc>.md` (summary + frontmatter incl. `hash` + `source`; flat —
+   pick a unique, descriptive name per the page conventions).
 4. Create/update the relevant `wiki/entities/` and/or `wiki/topics/` pages.
 5. For each standing topic listed in `wiki-config.md` (the `standing_topics` list), extract the
    items it tracks into `wiki/topics/<name>.md`, in the form its `type` implies — e.g. **temporal**: dates
@@ -111,12 +117,16 @@ Read `wiki-config.md` first. Two modes — both supported:
 
 Only new/changed files are read into context. Never re-read unchanged files.
 
-**Category reconciliation (both modes).** If an ingested file sits in a `raw/` subfolder not
-listed in `raw_categories` in `wiki-config.md`, the human created a new category by hand — this
-is supported, not an error. Register it: append the folder name to `raw_categories` (bump
-`updated`), add the category heading to `wiki/index.md`, and mention the new category in your
-report. The plain-language route works too: if the human asks you to "add a category", create
-`raw/<name>/` with a `.gitkeep` inside and make the same config + index updates.
+**Category reconciliation (both modes).** A file's category is its **first path segment under
+`raw/`** — never anything deeper. Nested folders (e.g. `raw/finance/taxes/2024/`) are the
+human's own filing structure: fully supported, preserved verbatim in `source:` paths, but NEVER
+registered as categories — `raw/finance/taxes/2024/w2.pdf` is category `finance`. If an
+ingested file's top-level folder is not listed in `raw_categories` in `wiki-config.md`, the
+human created a new category by hand — this is supported, not an error. Register it: append the
+folder name to `raw_categories` (bump `updated`), add the category heading to `wiki/index.md`,
+and mention the new category in your report. The plain-language route works too: if the human
+asks you to "add a category", create `raw/<name>/` with a `.gitkeep` inside and make the same
+config + index updates.
 
 ## Operation: QUERY
 
@@ -134,10 +144,12 @@ Sweep the wiki for health and write results to `outputs/lint-YYYY-MM-DD.md`:
 - Orphan pages (no incoming `[[wikilinks]]`).
 - Broken `[[wikilinks]]` and concepts referenced but never created.
 - `wiki/sources/` pages whose `raw/` file no longer exists, or whose hash now differs.
-- **Category drift** — report only; lint never edits the wiki or config:
-  - a `raw/` subfolder not listed in `raw_categories` (unregistered category — if it has files,
-    suggest `/wiki-ingest`, which registers it; if empty, note it as informational since it
-    self-registers on first ingest);
+- **Category drift** — report only; lint never edits the wiki or config. Only **top-level**
+  folders under `raw/` are categories; deeper nesting is the human's filing structure and is
+  never drift:
+  - a top-level `raw/` subfolder not listed in `raw_categories` (unregistered category — if it
+    has files, suggest `/wiki-ingest`, which registers it; if empty, note it as informational
+    since it self-registers on first ingest);
   - a category in `raw_categories` whose `raw/` folder is missing;
   - a category in `raw_categories` with no heading in `wiki/index.md`.
 
