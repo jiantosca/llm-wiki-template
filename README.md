@@ -13,8 +13,8 @@ subject (personal records, a research area, a project, a product — anything).
 ## Spin up a new wiki
 
 ```bash
-cp -R llm-wiki-template ~/my-new-wiki    # copy the template
-cd ~/my-new-wiki && claude               # open Claude here
+cp -R llm-wiki-template my-new-wiki    # copy the template
+cd my-new-wiki && claude               # open Claude here
 ```
 
 Then, in Claude:
@@ -38,13 +38,15 @@ since that's destructive. Done.
 
 From then on:
 
-- Drop files anywhere under `raw/`, then `/wiki-ingest` — process everything new or changed.
+- Drop files anywhere under `raw/`, then `/wiki-ingest` (or just say "process my new files") —
+  process everything new or changed.
   New top-level folders you create under `raw/` become new categories automatically, and you can
   nest folders as deep as you like inside a category (see
   ["Adding a category later"](#adding-a-category-later)).
 - **Just type your question** — it's answered from your wiki, with citations. No command needed.
 - `/wiki-topic-<your-standing-topic>` — one command per standing topic init generated for you (e.g. `/wiki-topic-renewals`).
-- `/wiki-lint` — periodic health check (contradictions, stale facts, broken links). Its product
+- `/wiki-lint` (or ask "anything stale in here?") — periodic health check (contradictions,
+  stale facts, broken links). Its product
   is a report in `outputs/` — it never edits the wiki, so it's always safe to run; you (or
   Claude, if you ask) fix things from the report.
 
@@ -149,10 +151,12 @@ The wiki refuses `/wiki-ingest`, `/wiki-query`, and `/wiki-lint` until you've ru
 (so you can't accidentally ingest into an un-configured wiki). This is enforced two ways:
 
 - **Command guards** (works everywhere): each command checks for `wiki-config.md` and stops if
-  it's missing. This also catches plain-English requests like "ingest my files."
+  it's missing. Plain-English requests like "ingest my files" route to the same commands
+  (`/wiki-ingest` and `/wiki-lint` are model-invocable), so they hit the same guard.
 - **A hook** (`.claude/hooks/require-init.js`, wired in `.claude/settings.json`): the harness
-  hard-blocks the slash commands if `wiki-config.md` is absent. **The first time you open a new
-  wiki, Claude Code asks you to approve the project hook — that's expected and one-time.**
+  hard-blocks the wiki slash commands *you type* if `wiki-config.md` is absent. (Commands Claude
+  invokes itself rely on the in-body guard above.) **The first time you open a new wiki, Claude
+  Code asks you to approve the project hook — that's expected and one-time.**
 
 `wiki-config.md`'s existence is the "is this initialized?" flag — no separate state.
 

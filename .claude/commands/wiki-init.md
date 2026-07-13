@@ -132,12 +132,15 @@ The `wiki-topic-` prefix is required: it namespaces the generated commands away 
 commands (`wiki-init/ingest/query/lint`) so a topic named e.g. "query" can never overwrite one,
 and it makes clear in a directory listing which commands are derived and regenerable.
 
+Generated topic commands carry **no** `disable-model-invocation` flag — deliberately. They are
+read-only reports, and leaving them model-invocable lets plain language ("what's coming up?")
+route to the right topic. Do not add the flag.
+
 **temporal** (example name `renewals`):
 ```
 ---
 description: Show upcoming <name> from the wiki
 argument-hint: "[optional window, e.g. '90 days' or a year]"
-disable-model-invocation: true
 ---
 Read `wiki/topics/<name>.md` and report upcoming items. If a window is given, filter to it:
 $ARGUMENTS — otherwise show the next 90 days, sorted by date. Note today's date and flag
@@ -149,7 +152,6 @@ anything already overdue.
 ---
 description: Show <name> from the wiki, grouped by status
 argument-hint: "[optional status filter, e.g. 'open' or 'blocked']"
-disable-model-invocation: true
 ---
 Read `wiki/topics/<name>.md` and report items grouped by status (open / blocked / resolved).
 If a status filter is given, show only that group: $ARGUMENTS.
@@ -160,7 +162,6 @@ If a status filter is given, show only that group: $ARGUMENTS.
 ---
 description: Show recent <name> from the wiki
 argument-hint: "[optional: how many, or a date range]"
-disable-model-invocation: true
 ---
 Read `wiki/topics/<name>.md` and list entries reverse-chronologically with their rationale.
 If a count or range is given, limit to it: $ARGUMENTS.
@@ -171,7 +172,6 @@ If a count or range is given, limit to it: $ARGUMENTS.
 ---
 description: Look up or list terms from the <name>
 argument-hint: "[optional term to look up; omit to list all]"
-disable-model-invocation: true
 ---
 Read `wiki/topics/<name>.md`. If a term is given, return its definition and any related terms:
 $ARGUMENTS — otherwise list all terms alphabetically with a one-line definition each.
@@ -182,7 +182,6 @@ $ARGUMENTS — otherwise list all terms alphabetically with a one-line definitio
 ---
 description: Show the latest <name> and how they've changed
 argument-hint: "[optional: a specific metric to focus on]"
-disable-model-invocation: true
 ---
 Read `wiki/topics/<name>.md` and report each tracked metric's most recent value, the date of that
 reading, and the change since the prior reading. If a metric is named, focus on it and show its
@@ -194,7 +193,6 @@ history: $ARGUMENTS.
 ---
 description: Show the <name> as a chronological timeline
 argument-hint: "[optional date range or filter]"
-disable-model-invocation: true
 ---
 Read `wiki/topics/<name>.md` and list events in forward-chronological order (oldest first) with
 their dates. If a range or filter is given, limit to it: $ARGUMENTS.
@@ -205,7 +203,6 @@ their dates. If a range or filter is given, limit to it: $ARGUMENTS.
 ---
 description: Compare the options tracked in the <name>
 argument-hint: "[optional: an option to focus on, or a criterion to sort by]"
-disable-model-invocation: true
 ---
 Read `wiki/topics/<name>.md` and present the options as a comparison table (options × criteria).
 If an option or criterion is given, focus or sort by it: $ARGUMENTS.
@@ -232,7 +229,9 @@ which a new wiki should not carry.
 - If there is no `.git/`: offer to `git init` a fresh repo.
 
 Either way, leave making the first commit to the human — or, if they ask, stage `wiki/`,
-`wiki-config.md`, `.claude/`, `.vscode/`, `.gitignore`, and the docs and make an initial commit.
+`wiki-config.md`, `.claude/`, `.vscode/`, `.gitignore`, `README.md`, and `CLAUDE.md` — exactly
+that list — and make an initial commit. Any other root-level markdown files are the template
+maintainer's stray notes, not part of this wiki: never stage them.
 `.vscode/` is part of the template (it disables format-on-save so the editor doesn't rewrite
 LLM-authored markdown) — include it even though editor config is normally personal. Never commit
 `outputs/` (always git-ignored); commit `raw/` only if the human chose `commit_raw: true` in

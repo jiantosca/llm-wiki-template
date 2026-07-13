@@ -52,6 +52,10 @@ wiki/sources/      ← one summary page per ingested raw document
 
 ### Required frontmatter on every wiki page
 
+Applies to content pages — everything under `wiki/entities/`, `wiki/topics/`, and
+`wiki/sources/`. The bookkeeping pages (`wiki/index.md`, `wiki/log.md`, `wiki/overview.md`)
+are exempt; lint must never flag them for missing frontmatter fields.
+
 ```yaml
 ---
 title: <human-readable title>
@@ -88,45 +92,11 @@ command per topic, and seed the wiki. Do not perform init logic anywhere else.
 
 ## Operation: INGEST
 
-Read `wiki-config.md` first. Two modes — both supported:
-
-**A. Specific file** ("ingest raw/<category>/<file>"):
-1. Read the source. (Claude Code can read PDFs directly.)
-2. Briefly tell the human the key takeaways.
-3. Write/update `wiki/sources/<doc>.md` (summary + frontmatter incl. `hash` + `source`; flat —
-   pick a unique, descriptive name per the page conventions).
-4. Create/update the relevant `wiki/entities/` and/or `wiki/topics/` pages.
-5. For each standing topic listed in `wiki-config.md` (the `standing_topics` list), extract the
-   items it tracks into `wiki/topics/<name>.md`, in the form its `type` implies — e.g. **temporal**: dates
-   that matter (deadlines, expirations, maturities); **status-list**: open items/tasks/risks;
-   **decision-log**: decisions + rationale; **glossary**: terms + definitions; **metrics**: a
-   dated reading of each tracked value; **timeline**: dated events; **comparison**: an option
-   with its criteria.
-6. Update `wiki/index.md`.
-7. Append one line to `wiki/log.md`.
-
-**B. Bulk — "ingest any new or changed raw files":**
-1. List everything under `raw/` (recurse all subfolders).
-2. For each file, compute its sha256 and compare against the `hash` in its existing
-   `wiki/sources/` page (if any).
-   - No source page → **new** → ingest.
-   - Hash differs → **changed** → re-ingest and bump `updated`.
-   - Hash matches → skip (no token cost beyond the hash).
-3. Run steps 3–7 above for each new/changed file.
-4. Summarize to the human what was ingested, changed, or skipped.
-
-Only new/changed files are read into context. Never re-read unchanged files.
-
-**Category reconciliation (both modes).** A file's category is its **first path segment under
-`raw/`** — never anything deeper. Nested folders (e.g. `raw/finance/taxes/2024/`) are the
-human's own filing structure: fully supported, preserved verbatim in `source:` paths, but NEVER
-registered as categories — `raw/finance/taxes/2024/w2.pdf` is category `finance`. If an
-ingested file's top-level folder is not listed in `raw_categories` in `wiki-config.md`, the
-human created a new category by hand — this is supported, not an error. Register it: append the
-folder name to `raw_categories` (bump `updated`), add the category heading to `wiki/index.md`,
-and mention the new category in your report. The plain-language route works too: if the human
-asks you to "add a category", create `raw/<name>/` with a `.gitkeep` inside and make the same
-config + index updates.
+The full ingest workflow lives in **`.claude/commands/wiki-ingest.md`** — that file is the
+single source of truth; do not improvise ingestion from memory. When the human asks in plain
+language ("ingest my files", "process the new statements"), invoke `/wiki-ingest` — with the
+file's path as the argument for a specific file, or no argument to sweep for anything new or
+changed.
 
 ## Operation: QUERY
 
@@ -138,20 +108,9 @@ config + index updates.
 
 ## Operation: LINT
 
-Sweep the wiki for health and write results to `outputs/lint-YYYY-MM-DD.md`:
-- Contradictions between pages.
-- **Stale claims** (older `updated` dates, superseded facts) — flag for refresh.
-- Orphan pages (no incoming `[[wikilinks]]`).
-- Broken `[[wikilinks]]` and concepts referenced but never created.
-- `wiki/sources/` pages whose `raw/` file no longer exists, or whose hash now differs.
-- **Category drift** — report only; lint never edits the wiki or config. Only **top-level**
-  folders under `raw/` are categories; deeper nesting is the human's filing structure and is
-  never drift:
-  - a top-level `raw/` subfolder not listed in `raw_categories` (unregistered category — if it
-    has files, suggest `/wiki-ingest`, which registers it; if empty, note it as informational
-    since it self-registers on first ingest);
-  - a category in `raw_categories` whose `raw/` folder is missing;
-  - a category in `raw_categories` with no heading in `wiki/index.md`.
+The full lint checklist lives in **`.claude/commands/wiki-lint.md`** — that file is the single
+source of truth; do not improvise the checks from memory. When the human asks for a health
+check in plain language ("anything stale in here?", "check the wiki"), invoke `/wiki-lint`.
 
 ## Bookkeeping rules
 
