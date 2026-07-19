@@ -53,3 +53,21 @@ folder name to `raw_categories` (bump `updated`), add the category heading to `w
 and mention the new category in your report. The plain-language route works too: if the human
 asks you to "add a category", create `raw/<name>/` with a `.gitkeep` inside and make the same
 config + index updates.
+
+**Commit checkpoint (both modes).** After the summary, if this wiki is a git repo (a `.git`
+directory exists), propose — do **not** run — a commit that snapshots the ingest, so each commit
+is a clean before/after checkpoint and `git diff` doubles as an audit trail of what you wrote.
+Check `commit_raw` in `wiki-config.md` to pick the paths:
+
+- `commit_raw: true` → `git add raw/ wiki/ wiki-config.md`
+- `commit_raw: false` (or absent) → `git add wiki/ wiki-config.md` (`raw/` is git-ignored)
+
+Suggest the full one-liner with a message derived from what actually happened — the source pages
+ingested or re-ingested, plus notable side effects — e.g.:
+
+```sh
+git add wiki/ wiki-config.md && git commit -m "ingest: chase-statement-2026-03, w2-2025 (+2 entities, renewals updated)"
+```
+
+Run it only if the human says yes. If there is no `.git` directory, skip the suggestion —
+optionally mention once that `git init` would enable history (see `/wiki-init` Step 6).
